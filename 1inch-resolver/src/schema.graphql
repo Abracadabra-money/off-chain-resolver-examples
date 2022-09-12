@@ -21,10 +21,6 @@ Only modify "UserArgs"
 """
 type UserArgs {
   chainId: String!
-  fromTokenAmount: BigInt!
-  minToTokenAmount: BigInt!
-  fromTokenAddress: String!
-  toTokenAddress: String!
   targetAddress: String!
 }
 

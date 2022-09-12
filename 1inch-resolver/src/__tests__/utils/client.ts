@@ -4,8 +4,8 @@ import { ethereumPlugin } from "@polywrap/ethereum-plugin-js";
 
 const env = process.env;
 
-const chain = env.CHAINID ?? "testnet";
-const provider = env.RPC_URL!;
+const chain = "1"; //env.CHAINID ?? "testnet";
+const provider = env.MAINNET_RPC_URL!;
 
 const polywrapClient = new PolywrapClient({
   plugins: [

@@ -162,7 +162,7 @@ function getSwapData(
   targetAddress: string
 ): string {
   let slippage = "3";
-  let swapApi = `https://api.1inch.io/v4.0/${chainId}/swap?fromTokenAddress=${fromTokenAddress}&toTokenAddress=${toTokenAddress}&amount=${fromTokenAmount}&fromAddress=${targetAddress}&slippage=${slippage}`;
+  let swapApi = `https://api.1inch.io/v4.0/${chainId}/swap?fromTokenAddress=${fromTokenAddress}&toTokenAddress=${toTokenAddress}&amount=${fromTokenAmount}&fromAddress=${targetAddress}&slippage=${slippage}&disableEstimate=true`;
 
   let res = Http_Module.get({
     request: null,
