@@ -16,28 +16,31 @@ export function checker(args: Args_checker): CheckerResult {
   let gelatoArgs = GelatoArgs.fromBuffer(args.gelatoArgsBuffer);
 
   let chainId = userArgs.chainId;
-  let fromTokenAmount = userArgs.fromTokenAmount;
-  let minToTokenAmount = userArgs.minToTokenAmount;
-  let fromTokenAddress = userArgs.fromTokenAddress;
-  let toTokenAddress = userArgs.toTokenAddress;
+  
+  let fromTokenAddress = "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3";
+  let toTokenAddress = "0x090185f2135308BaD17527004364eBcC2D37e5F6";
   let targetAddress = userArgs.targetAddress;
+
+  let fromTokenAmountString = Ethereum_Module.callContractView({
+    address: fromTokenAddress,
+    method: "function balanceOf(address) external view returns(uint256)",
+    args: [targetAddress],
+    connection: args.connection,
+  }).unwrap();
+
+  let fromTokenAmount = BigInt.fromString(fromTokenAmountString);
+
   let gasPrice = gelatoArgs.gasPrice;
   let timeStamp = gelatoArgs.timeStamp;
 
   logInfo(`chainId: ${chainId}`);
   logInfo(`fromTokenAmount: ${fromTokenAmount}`);
-  logInfo(`minToTokenAmount: ${minToTokenAmount}`);
   logInfo(`fromTokenAddress: ${fromTokenAddress}`);
   logInfo(`toTokenAddress: ${toTokenAddress}`);
   logInfo(`targetAddress: ${targetAddress}`);
   let canExec = false;
 
   let routerAddress = getRouterAddress(chainId);
-  let approveData = getApproveFromTokenData(
-    chainId,
-    fromTokenAddress,
-    fromTokenAmount
-  );
 
   let toTokenAmount = getQuote(
     chainId,
@@ -46,7 +49,7 @@ export function checker(args: Args_checker): CheckerResult {
     fromTokenAmount
   );
 
-  if (toTokenAmount.lt(minToTokenAmount)) return { canExec, execData: "" };
+  if (toTokenAmount.lt(BigInt.fromString("100000000000000000000000"))) return { canExec, execData: "" };
 
   let swapData = getSwapData(
     chainId,
@@ -65,8 +68,8 @@ export function checker(args: Args_checker): CheckerResult {
 ) external; */
 
   let execData = Ethereum_Module.encodeFunction({
-    method: "function approveAndSwap(address,address,bytes,bytes) external",
-    args: [fromTokenAddress, routerAddress, approveData, swapData],
+    method: "function swapMimForSpell1Inch(address,bytes) external",
+    args: [routerAddress, swapData],
   }).unwrap();
 
   return { canExec: true, execData: execData };
@@ -78,10 +81,6 @@ function getRouterAddress(chainId: string): string {
     request: null,
     url: routerApi,
   }).unwrap();
-
-  /* {
-    "address": "0x1111111254fb6c44bac0bed2854e76f90643097d"
-  } */
 
   if (!routerApiRes) throw Error("Get router api failed");
   let routerResObj = <JSON.Obj>JSON.parse(routerApiRes.body);
